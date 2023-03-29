@@ -59,4 +59,4 @@ class Neo:
             self.conn.sendall(data)
         else:
             self.sock.sendall(data)
-            #time.sleep(0.001)#doesnt work without this :/
+            #time.sleep(0.001)#optional
