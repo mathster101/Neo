@@ -66,3 +66,6 @@ class Neo:
             self.conn.sendall(data)
         else:
             self.sock.sendall(data)
+
+    def get_my_ip(self):
+        return socket.gethostbyname(socket.gethostname())
