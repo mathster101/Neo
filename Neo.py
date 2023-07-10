@@ -1,52 +1,70 @@
 import socket
 import pickle
-import time
 import base64
 import zlib
 
 class Neo:
     def __init__(self):
         self.sock = socket.socket()
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.conn = None
         self.addr = None
         self.i_am_a = None
         self.remnant = b''
+
+    def __del__(self):
+        try:
+            self.sock.close_conn()
+        except:
+            pass
 
     def start_server(self, PORT=9999):
         self.i_am_a = "server"
         self.sock.bind(('', PORT))
         self.sock.listen(5)
     
-    def get_new_conn(self):
-        self.conn, self.addr = self.sock.accept()
-        return (self.conn, self.addr)
+    def get_new_conn(self, timeout = False):
+        self.i_am_a = "server"
+        if timeout == True:
+            self.sock.settimeout(1)
+            try:
+                self.conn, self.addr = self.sock.accept()
+                self.sock.settimeout(None)
+                return (self.conn, self.addr)
+            except:
+                self.sock.settimeout(None)
+                return "Timeout"
+        else:
+            self.conn, self.addr = self.sock.accept()
+            return (self.conn, self.addr)
 
     def connect_client(self, PORT=9999, IP='127.0.0.1'):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.i_am_a = "client"
         self.sock.connect((IP, PORT))
+        #print(self.sock.getsockname())
+        return True
 
     def close_conn(self):
         if self.i_am_a=="server":
             self.conn.close()
         else:
             self.sock.close()
-        self.sock = socket.socket()
         self.conn = None
         self.addr = None
         self.i_am_a = None
-
 
     def receive_data(self):
         received = self.remnant
         end_char = bytes("msg-end", encoding = 'utf-8')
         if self.i_am_a == "server":
             while 1:
-                received += self.conn.recv(1024)
+                received += self.conn.recv(2**16)
                 if end_char in received:
                     break
         else:
             while 1:    
-                received += self.sock.recv(1024)
+                received += self.sock.recv(2**16)
                 if end_char in received:
                     break
         terminate_at = received.find(end_char)
