@@ -15,6 +15,7 @@ def server_proc():
     size = sys.getsizeof(data)
     print(size / (end - start))
     comm.send_data("hello from the server!!")
+    comm.close_conn()
     
 
 if __name__ == '__main__':
