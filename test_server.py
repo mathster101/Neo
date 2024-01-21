@@ -14,9 +14,10 @@ def server_proc():
     print(data[0])
     size = sys.getsizeof(data)
     print(size / (end - start))
-    comm.send_data("received data")
+    comm.send_data("hello from the server!!")
     
 
 if __name__ == '__main__':
     server = mp.Process(target=server_proc, args=())
     server.start()
+    print("server online")
